@@ -4,22 +4,32 @@ body {
     font-family: 'Lato';
 }
 
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
 .item {
     background-color: white;
     padding: 15px;
     margin-bottom: 15px;
     border: transparent;
-    border-radius: 5px;
+    border-radius: 15px;
     box-shadow: 0 0 1em #ccc;
     transition: all .2s ease-in-out;
 }
 
-.item:hover {
-    box-shadow: 0 0 1em #aaa;
+.item.completed {
+    background-color: #d4edda;
+    color: #155724;
 }
 
-.item.completed {
-    text-decoration: line-through;
+.item.completed .toggles {
+    color: #155724;
+}
+
+.item:hover {
+    box-shadow: 0 0 1em #aaa;
 }
 
 .toggles {
@@ -36,4 +46,32 @@ body {
 
 button:focus {
     border: 1px solid #333;
+    outline: none;
 }
+
+/* Additional styles to improve UI */
+.button,
+.btn {
+    border-radius: 15px;
+}
+
+.button.disabled,
+.btn.disabled {
+    opacity: 0.65;
+    pointer-events: none;
+}
+
+/* Styles for the loading spinner in the Add button */
+.fa-spinner {
+    animation: fa-spin 1s infinite linear;
+}
+
+@keyframes fa-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+

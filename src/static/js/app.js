@@ -1,10 +1,13 @@
 function App() {
     const { Container, Row, Col } = ReactBootstrap;
     return (
-        <Container>
+        <Container className="mt-5">
             <Row>
                 <Col md={{ offset: 3, span: 6 }}>
-                    <TodoListCard />
+                    <div className="card p-3 shadow" style={{ borderRadius: "15px", background: "linear-gradient(135deg, #81FBB8 0%, #28C76F 100%)" }}>
+                        <h2 className="text-center text-white">Todo List</h2>
+                        <TodoListCard />
+                    </div>
                 </Col>
             </Row>
         </Container>
@@ -53,7 +56,7 @@ function TodoListCard() {
         <React.Fragment>
             <AddItemForm onNewItem={onNewItem} />
             {items.length === 0 && (
-                <p className="text-center">No items saved to the todo! Add one above!</p>
+                <p className="text-center text-white-50">Nothing to do? Add a task!</p>
             )}
             {items.map(item => (
                 <ItemDisplay
@@ -66,7 +69,6 @@ function TodoListCard() {
         </React.Fragment>
     );
 }
-
 function AddItemForm({ onNewItem }) {
     const { Form, InputGroup, Button } = ReactBootstrap;
 
@@ -93,20 +95,19 @@ function AddItemForm({ onNewItem }) {
         <Form onSubmit={submitNewItem}>
             <InputGroup className="mb-3">
                 <Form.Control
-                    value={newItem}
-                    onChange={e => setNewItem(e.target.value)}
-                    type="text"
-                    placeholder="New Item"
-                    aria-describedby="basic-addon1"
+                    // ...
+                    className="rounded-pill"
+                    placeholder="What needs to be done?"
+                    // ...
                 />
                 <InputGroup.Append>
                     <Button
                         type="submit"
-                        variant="success"
-                        disabled={!newItem.length}
-                        className={submitting ? 'disabled' : ''}
+                        variant="dark"
+                        className={"rounded-pill " + (submitting ? 'disabled' : '')}
+                        // ...
                     >
-                        {submitting ? 'Adding...' : 'Add'}
+                        {submitting ? <i className="fa fa-spinner fa-spin"></i> : 'Add Task'}
                     </Button>
                 </InputGroup.Append>
             </InputGroup>
@@ -137,43 +138,34 @@ function ItemDisplay({ item, onItemUpdate, onItemRemoval }) {
     };
 
     return (
-        <Container fluid className={`item ${item.completed && 'completed'}`}>
+        <Container fluid className={`item p-2 mb-2 rounded shadow-sm ${item.completed && 'bg-success text-white'}`}>
             <Row>
                 <Col xs={1} className="text-center">
                     <Button
-                        className="toggles"
-                        size="sm"
-                        variant="link"
+                        variant={item.completed ? "outline-light" : "outline-success"}
+                        className="p-1"
                         onClick={toggleCompletion}
-                        aria-label={
-                            item.completed
-                                ? 'Mark item as incomplete'
-                                : 'Mark item as complete'
-                        }
+                        aria-label={item.completed ? 'Mark as incomplete' : 'Mark as complete'}
                     >
-                        <i
-                            className={`far ${
-                                item.completed ? 'fa-check-square' : 'fa-square'
-                            }`}
-                        />
+                        <i className={`fa ${item.completed ? 'fa-check-circle' : 'fa-circle'}`} />
                     </Button>
                 </Col>
-                <Col xs={10} className="name">
+                <Col xs={10} className="align-self-center">
                     {item.name}
                 </Col>
-                <Col xs={1} className="text-center remove">
+                <Col xs={1} className="text-center">
                     <Button
-                        size="sm"
-                        variant="link"
+                        variant="outline-danger"
+                        className="p-1"
                         onClick={removeItem}
                         aria-label="Remove Item"
                     >
-                        <i className="fa fa-trash text-danger" />
+                        <i className="fa fa-trash" />
                     </Button>
                 </Col>
             </Row>
         </Container>
     );
 }
-
 ReactDOM.render(<App />, document.getElementById('root'));
+
