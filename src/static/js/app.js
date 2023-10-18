@@ -15,7 +15,7 @@ function App() {
 }
 
 function TodoListCard() {
-    const [items, setItems] = React.useState([]); // Initialize with an empty array
+    const [items, setItems] = React.useState(['Hello']); // Initialize with an empty array
 
     React.useEffect(() => {
         fetch('/items')
