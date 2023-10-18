@@ -1,13 +1,10 @@
 function App() {
     const { Container, Row, Col } = ReactBootstrap;
     return (
-        <Container className="mt-5">
+        <Container>
             <Row>
                 <Col md={{ offset: 3, span: 6 }}>
-                    <div className="card p-3 shadow" style={{ borderRadius: "15px", background: "linear-gradient(135deg, #81FBB8 0%, #28C76F 100%)" }}>
-                        <h2 className="text-center text-white">Todo List</h2>
-                        <TodoListCard />
-                    </div>
+                    <TodoListCard />
                 </Col>
             </Row>
         </Container>
@@ -15,21 +12,19 @@ function App() {
 }
 
 function TodoListCard() {
-    const [items, setItems] = React.useState([]); // Initialize with an empty array
+    const [items, setItems] = React.useState(null);
 
     React.useEffect(() => {
         fetch('/items')
             .then(r => r.json())
-            .then(data => setItems(data || [])); // Ensure data is an array or fallback to empty array
+            .then(setItems);
     }, []);
 
     const onNewItem = React.useCallback(
         newItem => {
-            if(newItem && newItem.id && newItem.name) { // Ensure newItem has necessary fields
-                setItems(prevItems => [...prevItems, newItem]);
-            }
+            setItems([...items, newItem]);
         },
-        [],
+        [items],
     );
 
     const onItemUpdate = React.useCallback(
@@ -52,13 +47,13 @@ function TodoListCard() {
         [items],
     );
 
-    if (items.length === 0) return 'Loading...';
+    if (items === null) return 'Loading...';
 
     return (
         <React.Fragment>
             <AddItemForm onNewItem={onNewItem} />
             {items.length === 0 && (
-                <p className="text-center text-white-50">Nothing to do? Add a task!</p>
+                <p className="text-center">No items yet! Add one above!</p>
             )}
             {items.map(item => (
                 <ItemDisplay
@@ -98,19 +93,20 @@ function AddItemForm({ onNewItem }) {
         <Form onSubmit={submitNewItem}>
             <InputGroup className="mb-3">
                 <Form.Control
-                    // ...
-                    className="rounded-pill"
-                    placeholder="What needs to be done?"
-                    // ...
+                    value={newItem}
+                    onChange={e => setNewItem(e.target.value)}
+                    type="text"
+                    placeholder="New Item"
+                    aria-describedby="basic-addon1"
                 />
                 <InputGroup.Append>
                     <Button
                         type="submit"
-                        variant="dark"
-                        className={"rounded-pill " + (submitting ? 'disabled' : '')}
-                        // ...
+                        variant="success"
+                        disabled={!newItem.length}
+                        className={submitting ? 'disabled' : ''}
                     >
-                        {submitting ? <i className="fa fa-spinner fa-spin"></i> : 'Add Task'}
+                        {submitting ? 'Adding...' : 'Add Item'}
                     </Button>
                 </InputGroup.Append>
             </InputGroup>
@@ -141,34 +137,43 @@ function ItemDisplay({ item, onItemUpdate, onItemRemoval }) {
     };
 
     return (
-        <Container fluid className={`item p-2 mb-2 rounded shadow-sm ${item.completed && 'bg-success text-white'}`}>
+        <Container fluid className={`item ${item.completed && 'completed'}`}>
             <Row>
                 <Col xs={1} className="text-center">
                     <Button
-                        variant={item.completed ? "outline-light" : "outline-success"}
-                        className="p-1"
+                        className="toggles"
+                        size="sm"
+                        variant="link"
                         onClick={toggleCompletion}
-                        aria-label={item.completed ? 'Mark as incomplete' : 'Mark as complete'}
+                        aria-label={
+                            item.completed
+                                ? 'Mark item as incomplete'
+                                : 'Mark item as complete'
+                        }
                     >
-                        <i className={`fa ${item.completed ? 'fa-check-circle' : 'fa-circle'}`} />
+                        <i
+                            className={`far ${
+                                item.completed ? 'fa-check-square' : 'fa-square'
+                            }`}
+                        />
                     </Button>
                 </Col>
-                <Col xs={10} className="align-self-center">
+                <Col xs={10} className="name">
                     {item.name}
                 </Col>
-                <Col xs={1} className="text-center">
+                <Col xs={1} className="text-center remove">
                     <Button
-                        variant="outline-danger"
-                        className="p-1"
+                        size="sm"
+                        variant="link"
                         onClick={removeItem}
                         aria-label="Remove Item"
                     >
-                        <i className="fa fa-trash" />
+                        <i className="fa fa-trash text-danger" />
                     </Button>
                 </Col>
             </Row>
         </Container>
     );
 }
-ReactDOM.render(<App />, document.getElementById('root'));
 
+ReactDOM.render(<App />, document.getElementById('root'));
