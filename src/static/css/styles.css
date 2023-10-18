@@ -1,43 +1,35 @@
 body {
-    background-color: #f4f4f4;
+    background: linear-gradient(to right, #74ebd5, #acb6e5); /* Adding gradient */
     margin-top: 50px;
     font-family: 'Lato';
 }
 
-.card {
-    border-radius: 15px;
-    overflow: hidden;
-}
-
 .item {
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.9); /* Slight transparency to the item background */
     padding: 15px;
     margin-bottom: 15px;
     border: transparent;
-    border-radius: 15px;
-    box-shadow: 0 0 1em #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 1em rgba(0, 0, 0, 0.1);
     transition: all .2s ease-in-out;
 }
 
-.item.completed {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-.item.completed .toggles {
-    color: #155724;
-}
-
 .item:hover {
-    box-shadow: 0 0 1em #aaa;
+    box-shadow: 0 0 1.5em rgba(0, 0, 0, 0.2);
+}
+
+.item.completed {
+    text-decoration: none; /* Removing the strike-through */
+    background-color: #e7fce0; /* Light green background for completed items */
 }
 
 .toggles {
-    color: black;
+    color: #333;
 }
 
 .name {
     padding-top: 3px;
+    font-size: 1.1em; /* Slightly increasing the font size */
 }
 
 .remove {
@@ -49,29 +41,32 @@ button:focus {
     outline: none;
 }
 
-/* Additional styles to improve UI */
-.button,
-.btn {
-    border-radius: 15px;
+/* Enhanced button styles */
+.btn, .btn-success {
+    background-color: #5f85db;
+    border-color: #5f85db;
+    color: white;
+    transition: all .2s ease-in-out;
 }
 
-.button.disabled,
-.btn.disabled {
-    opacity: 0.65;
-    pointer-events: none;
+.btn-success:hover {
+    background-color: #466ab7;
+    border-color: #466ab7;
 }
 
-/* Styles for the loading spinner in the Add button */
-.fa-spinner {
-    animation: fa-spin 1s infinite linear;
+.btn-link {
+    color: #5f85db;
 }
 
-@keyframes fa-spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+.btn-link:hover {
+    color: #466ab7;
+    text-decoration: none;
 }
 
+.far, .fa {
+    transition: all .2s ease-in-out;
+}
+
+.far:hover, .fa-trash:hover {
+    transform: scale(1.1);
+}
