@@ -15,19 +15,21 @@ function App() {
 }
 
 function TodoListCard() {
-    const [items, setItems] = React.useState(null);
+    const [items, setItems] = React.useState([]); // Initialize with an empty array
 
     React.useEffect(() => {
         fetch('/items')
             .then(r => r.json())
-            .then(setItems);
+            .then(data => setItems(data || [])); // Ensure data is an array or fallback to empty array
     }, []);
 
     const onNewItem = React.useCallback(
         newItem => {
-            setItems([...items, newItem]);
+            if(newItem && newItem.id && newItem.name) { // Ensure newItem has necessary fields
+                setItems(prevItems => [...prevItems, newItem]);
+            }
         },
-        [items],
+        [],
     );
 
     const onItemUpdate = React.useCallback(
@@ -50,7 +52,7 @@ function TodoListCard() {
         [items],
     );
 
-    if (items === null) return 'Loading...';
+    if (items.length === 0) return 'Loading...';
 
     return (
         <React.Fragment>
@@ -69,6 +71,7 @@ function TodoListCard() {
         </React.Fragment>
     );
 }
+
 function AddItemForm({ onNewItem }) {
     const { Form, InputGroup, Button } = ReactBootstrap;
 
