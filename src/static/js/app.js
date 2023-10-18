@@ -103,10 +103,9 @@ function AddItemForm({ onNewItem }) {
                     <Button
                         type="submit"
                         variant="success"
-                        disabled={!newItem.length}
-                        className={submitting ? 'disabled' : ''}
+                        disabled={!newItem.length || submitting} // Disable button while submitting
                     >
-                        {submitting ? 'Adding...' : 'Add Item'}
+                        {submitting ? <i className="fa fa-spinner fa-spin"></i> : 'Add Item'} 
                     </Button>
                 </InputGroup.Append>
             </InputGroup>
@@ -117,7 +116,10 @@ function AddItemForm({ onNewItem }) {
 function ItemDisplay({ item, onItemUpdate, onItemRemoval }) {
     const { Container, Row, Col, Button } = ReactBootstrap;
 
+    const [isToggling, setIsToggling] = React.useState(false);
+
     const toggleCompletion = () => {
+        setIsToggling(true);
         fetch(`/items/${item.id}`, {
             method: 'PUT',
             body: JSON.stringify({
@@ -127,16 +129,18 @@ function ItemDisplay({ item, onItemUpdate, onItemRemoval }) {
             headers: { 'Content-Type': 'application/json' },
         })
             .then(r => r.json())
-            .then(onItemUpdate);
+            .then(updatedItem => {
+                onItemUpdate(updatedItem);
+                setIsToggling(false);
+            });
     };
-
     const removeItem = () => {
         fetch(`/items/${item.id}`, { method: 'DELETE' }).then(() =>
             onItemRemoval(item),
         );
     };
 
-    return (
+     return (
         <Container fluid className={`item ${item.completed && 'completed'}`}>
             <Row>
                 <Col xs={1} className="text-center">
@@ -150,12 +154,14 @@ function ItemDisplay({ item, onItemUpdate, onItemRemoval }) {
                                 ? 'Mark item as incomplete'
                                 : 'Mark item as complete'
                         }
+                        disabled={isToggling}
                     >
+                        {isToggling ? <i className="fa fa-spinner fa-spin"></i> : 
                         <i
                             className={`far ${
                                 item.completed ? 'fa-check-square' : 'fa-square'
                             }`}
-                        />
+                        />}
                     </Button>
                 </Col>
                 <Col xs={10} className="name">
