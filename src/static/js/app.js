@@ -1,3 +1,5 @@
+const MODE = process.env.REACT_APP_MODE || 'full';
+
 function App() {
     const { Container, Row, Col } = ReactBootstrap;
     return (
@@ -20,54 +22,22 @@ function TodoListCard() {
             .then(setItems);
     }, []);
 
-    const onNewItem = React.useCallback(
-        newItem => {
-            setItems([...items, newItem]);
-        },
-        [items],
-    );
-
-    const onItemUpdate = React.useCallback(
-        item => {
-            const index = items.findIndex(i => i.id === item.id);
-            setItems([
-                ...items.slice(0, index),
-                item,
-                ...items.slice(index + 1),
-            ]);
-        },
-        [items],
-    );
-
-    const onItemRemoval = React.useCallback(
-        item => {
-            const index = items.findIndex(i => i.id === item.id);
-            setItems([...items.slice(0, index), ...items.slice(index + 1)]);
-        },
-        [items],
-    );
-
     if (items === null) return 'Loading...';
 
     return (
         <React.Fragment>
-            <AddItemForm onNewItem={onNewItem} />
+            {MODE !== 'readonly' && <AddItemForm />}
             {items.length === 0 && (
-                <p className="text-center">No items Add one above!</p>
+                <p className="text-center">No items. Add one above!</p>
             )}
             {items.map(item => (
-                <ItemDisplay
-                    item={item}
-                    key={item.id}
-                    onItemUpdate={onItemUpdate}
-                    onItemRemoval={onItemRemoval}
-                />
+                <ItemDisplay item={item} key={item.id} />
             ))}
         </React.Fragment>
     );
 }
 
-function AddItemForm({ onNewItem }) {
+function AddItemForm() {
     const { Form, InputGroup, Button } = ReactBootstrap;
 
     const [newItem, setNewItem] = React.useState('');
@@ -83,7 +53,6 @@ function AddItemForm({ onNewItem }) {
         })
             .then(r => r.json())
             .then(item => {
-                onNewItem(item);
                 setSubmitting(false);
                 setNewItem('');
             });
@@ -105,7 +74,7 @@ function AddItemForm({ onNewItem }) {
                         variant="success"
                         disabled={!newItem.length || submitting} // Disable button while submitting
                     >
-                        {submitting ? <i className="fa fa-spinner fa-spin"></i> : 'Add Item'} 
+                        {submitting ? <i className="fa fa-spinner fa-spin"></i> : 'Add Item'}
                     </Button>
                 </InputGroup.Append>
             </InputGroup>
@@ -113,69 +82,22 @@ function AddItemForm({ onNewItem }) {
     );
 }
 
-function ItemDisplay({ item, onItemUpdate, onItemRemoval }) {
-    const { Container, Row, Col, Button } = ReactBootstrap;
+function ItemDisplay({ item }) {
+    const { Container, Row, Col } = ReactBootstrap;
 
-    const [isToggling, setIsToggling] = React.useState(false);
-
-    const toggleCompletion = () => {
-        setIsToggling(true);
-        fetch(`/items/${item.id}`, {
-            method: 'PUT',
-            body: JSON.stringify({
-                name: item.name,
-                completed: !item.completed,
-            }),
-            headers: { 'Content-Type': 'application/json' },
-        })
-            .then(r => r.json())
-            .then(updatedItem => {
-                onItemUpdate(updatedItem);
-                setIsToggling(false);
-            });
-    };
-    const removeItem = () => {
-        fetch(`/items/${item.id}`, { method: 'DELETE' }).then(() =>
-            onItemRemoval(item),
-        );
-    };
-
-     return (
+    return (
         <Container fluid className={`item ${item.completed && 'completed'}`}>
             <Row>
+                {MODE === 'full' && 
                 <Col xs={1} className="text-center">
-                    <Button
-                        className="toggles"
-                        size="sm"
-                        variant="link"
-                        onClick={toggleCompletion}
-                        aria-label={
-                            item.completed
-                                ? 'Mark item as incomplete'
-                                : 'Mark item as complete'
-                        }
-                        disabled={isToggling}
-                    >
-                        {isToggling ? <i className="fa fa-spinner fa-spin"></i> : 
-                        <i
-                            className={`far ${
-                                item.completed ? 'fa-check-square' : 'fa-square'
-                            }`}
-                        />}
-                    </Button>
-                </Col>
-                <Col xs={10} className="name">
+                    <i
+                        className={`far ${
+                            item.completed ? 'fa-check-square' : 'fa-square'
+                        }`}
+                    />
+                </Col>}
+                <Col xs={MODE === 'full' ? 10 : 11} className="name">
                     {item.name}
-                </Col>
-                <Col xs={1} className="text-center remove">
-                    <Button
-                        size="sm"
-                        variant="link"
-                        onClick={removeItem}
-                        aria-label="Remove Item"
-                    >
-                        <i className="fa fa-trash text-danger" />
-                    </Button>
                 </Col>
             </Row>
         </Container>
